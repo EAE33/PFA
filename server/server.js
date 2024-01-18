@@ -35,6 +35,37 @@ const getAccessToken = async () => {
 
 getAccessToken()
 
+app.get("/dogs", async (req, res) => {
+    try {
+        const animalsList = await fetch('https://api.petfinder.com/v2/animals?type=dog', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        const animalData = await animalsList.json()
+        res.json(animalData)
+    } catch (error) {
+        console.error("Error Fetching Dogs", error)
+    }
+})
+
+app.get("/cats", async (req, res) => {
+    try {
+        const animalsList = await fetch('https://api.petfinder.com/v2/animals?type=cat', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        const animalData = await animalsList.json()
+        res.json(animalData)
+    } catch (error) {
+        console.error("Error Fetching Cats", error)
+    }
+})
 //Test Call
 app.get("/", (req, res) => {
     res.json({ "users": ["userOne", "userTwo", "userThree", "userFour"] })
