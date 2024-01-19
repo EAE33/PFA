@@ -29,15 +29,14 @@ const getAccessToken = async () => {
         console.log("Access Token:", accessToken)
     } catch (error) {
         console.error("Error fetching access token:", error)
-        throw error
     }
 }
 
 getAccessToken()
 
-app.get("/dogs", async (req, res) => {
+async function fetchAnimalData(animalType, res) {
     try {
-        const animalsList = await fetch('https://api.petfinder.com/v2/animals?type=dog', {
+        const animalsList = await fetch(`https://api.petfinder.com/v2/animals?type=${animalType}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -47,24 +46,16 @@ app.get("/dogs", async (req, res) => {
         const animalData = await animalsList.json()
         res.json(animalData)
     } catch (error) {
-        console.error("Error Fetching Dogs", error)
+        console.error(`Error Fetching ${animalType}`, error)
     }
+}
+
+app.get("/dogs", async (req, res) => {
+    await fetchAnimalData('dog', res)
 })
 
 app.get("/cats", async (req, res) => {
-    try {
-        const animalsList = await fetch('https://api.petfinder.com/v2/animals?type=cat', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-        });
-        const animalData = await animalsList.json()
-        res.json(animalData)
-    } catch (error) {
-        console.error("Error Fetching Cats", error)
-    }
+    await fetchAnimalData('cat', res)
 })
 //Test Call
 app.get("/", (req, res) => {
