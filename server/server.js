@@ -32,10 +32,12 @@ const getAccessToken = async () => {
     }
 }
 
-getAccessToken()
-
-async function fetchAnimalData(animalType, res) {
+// Fetch Dog/Cat List
+async function fetchAnimalList(animalType, res) {
     try {
+        if (!accessToken) {
+            await getAccessToken()
+        }
         const animalsList = await fetch(`https://api.petfinder.com/v2/animals?type=${animalType}`, {
             method: 'GET',
             headers: {
@@ -50,13 +52,75 @@ async function fetchAnimalData(animalType, res) {
     }
 }
 
+//Fetch Random Dog
+async function fetchRandomDog(req, res) {
+    try {
+        if (!accessToken) {
+            await getAccessToken()
+        }
+        const dogList = await fetch('https://api.petfinder.com/v2/animals?type=dog', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await dogList.json()
+        if (data.animals && data.animals.length > 0) {
+            const randomIndex = Math.floor(Math.random() * data.animals.length)
+            const randomDogDetails = data.animals[randomIndex]
+            res.json(randomDogDetails)
+        } else {
+            console.log('Error fetching random dog details', error)
+        }
+    } catch (error) {
+        console.error('Error Fetching', error)
+    }
+}
+
+// Fetch Random Cat
+async function fetchRandomCat(req, res) {
+    try {
+        if (!accessToken) {
+            await getAccessToken()
+        }
+        const catList = await fetch('https://api.petfinder.com/v2/animals?type=cat', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await catList.json()
+        if (data.animals && data.animals.length > 0) {
+            const randomIndex = Math.floor(Math.random() * data.animals.length)
+            const randomCatDetails = data.animals[randomIndex]
+            res.json(randomCatDetails)
+        } else {
+            console.log('Error fetching random cat details', error)
+        }
+    } catch (error) {
+        console.log('Error Fetching', error)
+
+    }
+}
+
 app.get("/dogs", async (req, res) => {
-    await fetchAnimalData('dog', res)
+    await fetchAnimalList('dog', res)
 })
 
 app.get("/cats", async (req, res) => {
-    await fetchAnimalData('cat', res)
+    await fetchAnimalList('cat', res)
 })
+
+app.get("/rdmdog", async (req, res) => {
+    await fetchRandomDog(req, res)
+})
+
+app.get("/rdmcat", async (req, res) => {
+    await fetchRandomCat(req, res)
+})
+
 //Test Call
 app.get("/", (req, res) => {
     res.json({ "users": ["userOne", "userTwo", "userThree", "userFour"] })
